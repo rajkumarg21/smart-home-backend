@@ -1,5 +1,6 @@
 package com.rks.automation.service;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import com.rks.automation.dto.AuthResponse;
 import com.rks.automation.dto.LoginRequest;
 import com.rks.automation.dto.RegisterRequest;
@@ -22,66 +23,53 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtTokenProvider;
+	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
+	private final AuthenticationManager authenticationManager;
+	private final JwtTokenProvider jwtTokenProvider;
 
-    // ── Register ─────────────────────────────────────────────────────────────
-   
-    
-    @Transactional
-    public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException(
-                    "Username already taken: " + request.getUsername());
-        }
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException(
-                    "Email already registered: " + request.getEmail());
-        }
+	// ── Register ─────────────────────────────────────────────────────────────
 
-        // Default to ROLE_USER; prevent self-assignment of ROLE_ADMIN
-        Role role = (request.getRole() != null && request.getRole() != Role.ROLE_ADMIN)
-                ? request.getRole()
-                : Role.ROLE_USER;
+	@Transactional
+	public AuthResponse register(RegisterRequest request) {
+		if (userRepository.existsByUsername(request.getUsername())) {
+			throw new IllegalArgumentException("Username already taken: " + request.getUsername());
+		}
+		if (userRepository.existsByEmail(request.getEmail())) {
+			throw new IllegalArgumentException("Email already registered: " + request.getEmail());
+		}
 
-        User user = User.builder()
-                .username(request.getUsername())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .fullName(request.getFullName())
-                .role(role)
-                .build();
+		// Default to ROLE_USER; prevent self-assignment of ROLE_ADMIN
+		Role role = (request.getRole() != null && request.getRole() != Role.ROLE_ADMIN) ? request.getRole()
+				: Role.ROLE_USER;
 
-        userRepository.save(user);
+		User user = User.builder().username(request.getUsername()).email(request.getEmail())
+				.password(passwordEncoder.encode(request.getPassword())).fullName(request.getFullName()).role(role)
+				.build();
 
-        String token = jwtTokenProvider.generateToken(user);
-        return buildResponse(user, token);
-    }
+		userRepository.save(user);
 
-    // ── Login ─────────────────────────────────────────────────────────────────
+		String token = jwtTokenProvider.generateToken(user);
+		return buildResponse(user, token);
+	}
 
-    public AuthResponse login(LoginRequest request) {
-        // Delegates to DaoAuthenticationProvider → CustomUserDetailsService
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(), request.getPassword()));
+	// ── Login ─────────────────────────────────────────────────────────────────
 
-        String token = jwtTokenProvider.generateToken(authentication);
-        User user = (User) authentication.getPrincipal();
-        return buildResponse(user, token);
-    }
+	public AuthResponse login(LoginRequest request) {
+		// Delegates to DaoAuthenticationProvider → CustomUserDetailsService
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+		Authentication authentication = authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
-    private AuthResponse buildResponse(User user, String token) {
-        return AuthResponse.builder()
-                .accessToken(token)
-                .userId(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .build();
-    }
+		String token = jwtTokenProvider.generateToken(authentication);
+		User user = (User) authentication.getPrincipal();
+		return buildResponse(user, token);
+	}
+
+	// ── Helpers ───────────────────────────────────────────────────────────────
+
+	private AuthResponse buildResponse(User user, String token) {
+		return AuthResponse.builder().accessToken(token).userId(user.getId()).username(user.getUsername())
+				.email(user.getEmail()).role(user.getRole()).build();
+	}
 }

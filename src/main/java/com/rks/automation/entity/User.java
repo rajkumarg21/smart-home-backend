@@ -115,15 +115,5 @@ public class User implements UserDetails {
         return enabled;
     }
 
-	@Override
-	public @Nullable String getPassword() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getUsername() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 }
