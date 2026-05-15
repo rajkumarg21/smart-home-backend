@@ -6,8 +6,9 @@ import com.rks.automation.dto.LoginRequest;
 import com.rks.automation.dto.RegisterRequest;
 import com.rks.automation.entity.Role;
 import com.rks.automation.entity.User;
+import com.rks.automation.repository.UserRepository;
 import com.rks.automation.security.JwtTokenProvider;
-import com.rks.automation.user.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

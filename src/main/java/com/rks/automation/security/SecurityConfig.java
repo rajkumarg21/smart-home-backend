@@ -74,10 +74,13 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                     // Public: login & register
                     .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/ws/**").permitAll()          
                     // Admin-only management endpoints
                     .requestMatchers("/api/users", "/api/users/**").hasRole("ADMIN")
                     // Any authenticated user can access their own profile
                     .requestMatchers("/api/users/me").authenticated()
+                    // Device endpoints — any authenticated user
+                    .requestMatchers("/device/**").authenticated()
                     // Everything else requires authentication
                     .anyRequest().authenticated()
             )

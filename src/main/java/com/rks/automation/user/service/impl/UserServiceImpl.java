@@ -2,8 +2,8 @@ package com.rks.automation.user.service.impl;
 
 import com.rks.automation.dto.UserProfileDto;
 import com.rks.automation.entity.User;
+import com.rks.automation.repository.UserRepository;
 import com.rks.automation.service.UserService;
-import com.rks.automation.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

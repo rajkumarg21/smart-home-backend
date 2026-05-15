@@ -1,4 +1,4 @@
-package com.rks.automation.user.repository;
+package com.rks.automation.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -1,12 +1,13 @@
 package com.rks.automation.security;
 
-import com.rks.automation.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.rks.automation.repository.UserRepository;
 
 /**
  * Loads a User entity from the database for Spring Security.
