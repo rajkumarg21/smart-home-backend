@@ -80,7 +80,7 @@ public class SecurityConfig {
                     // Any authenticated user can access their own profile
                     .requestMatchers("/api/users/me").authenticated()
                     // Device endpoints — any authenticated user
-                    .requestMatchers("/device/**").authenticated()
+                    .requestMatchers("/api/device/**").authenticated()
                     // Everything else requires authentication
                     .anyRequest().authenticated()
             )

@@ -1,7 +1,7 @@
 package com.rks.automation.service.impl;
 
-import com.rks.automation.dto.DeviceRequest;
-import com.rks.automation.dto.DeviceResponse;
+import com.rks.automation.dto.device.DeviceRequest;
+import com.rks.automation.dto.device.DeviceResponse;
 import com.rks.automation.entity.Device;
 import com.rks.automation.entity.User;
 import com.rks.automation.repository.DeviceRepository;

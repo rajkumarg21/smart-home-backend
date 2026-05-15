@@ -1,8 +1,8 @@
 package com.rks.automation.controller;
 
 import com.rks.automation.common.ApiResponse;
-import com.rks.automation.dto.DeviceRequest;
-import com.rks.automation.dto.DeviceResponse;
+import com.rks.automation.dto.device.DeviceRequest;
+import com.rks.automation.dto.device.DeviceResponse;
 import com.rks.automation.service.DeviceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
