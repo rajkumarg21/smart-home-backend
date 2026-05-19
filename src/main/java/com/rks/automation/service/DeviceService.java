@@ -19,6 +19,9 @@ public interface DeviceService {
     /** Control a device — action is "ON" or "OFF". */
     DeviceResponse controlDevice(String username, Long deviceId, String action);
 
+    /** Control a device and record the command source for device communication. */
+    DeviceResponse controlDevice(String username, Long deviceId, String action, String source, String command);
+
     /** Delete a device owned by the authenticated user. */
     void deleteDevice(String username, Long deviceId);
 }

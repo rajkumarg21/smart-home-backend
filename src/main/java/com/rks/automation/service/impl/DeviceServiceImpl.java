@@ -6,6 +6,7 @@ import com.rks.automation.entity.Device;
 import com.rks.automation.entity.User;
 import com.rks.automation.repository.DeviceRepository;
 import com.rks.automation.repository.UserRepository;
+import com.rks.automation.service.DeviceCommandPublisher;
 import com.rks.automation.service.DeviceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,6 +27,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     private final DeviceRepository deviceRepository;
     private final UserRepository   userRepository;
+    private final DeviceCommandPublisher deviceCommandPublisher;
 
     // ── GET /device/list ─────────────────────────────────────────────────────
 
@@ -75,6 +77,12 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     @Transactional
     public DeviceResponse controlDevice(String username, Long deviceId, String action) {
+        return controlDevice(username, deviceId, action, "USER", action);
+    }
+
+    @Override
+    @Transactional
+    public DeviceResponse controlDevice(String username, Long deviceId, String action, String source, String command) {
         User user = resolveUser(username);
 
         Device device = deviceRepository.findByIdAndUserId(deviceId, user.getId())
@@ -88,7 +96,9 @@ public class DeviceServiceImpl implements DeviceService {
         }
 
         device.setStatus(normalized);
-        return DeviceResponse.from(deviceRepository.save(device));
+        DeviceResponse response = DeviceResponse.from(deviceRepository.save(device));
+        deviceCommandPublisher.publish(response, normalized, source, command);
+        return response;
     }
 
     // ── DELETE /device/delete/{deviceId} ─────────────────────────────────────

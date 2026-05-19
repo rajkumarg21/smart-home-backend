@@ -78,6 +78,25 @@ public class DeviceController {
     }
 
     /**
+     * PUT /device/status
+     * Body: { "deviceId": 1, "status": "ON" | "OFF" }
+     */
+    @PutMapping("/device/status")
+    public ResponseEntity<ApiResponse<DeviceResponse>> reportDeviceStatus(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody Map<String, Object> body) {
+
+        Long deviceId = Long.valueOf(body.get("deviceId").toString());
+        String status = body.get("status").toString();
+
+        DeviceResponse device = deviceService.controlDevice(
+                userDetails.getUsername(), deviceId, status, "DEVICE", "Device status report");
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Device status updated successfully", device));
+    }
+
+    /**
      * DELETE /device/delete/{deviceId}
      */
     @DeleteMapping("/device/delete/{deviceId}")

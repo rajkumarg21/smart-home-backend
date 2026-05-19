@@ -12,12 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Authentication endpoints — all public (no JWT required).
- *
- * POST /api/auth/register  → create account, returns JWT
- * POST /api/auth/login     → authenticate, returns JWT
- */
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
