@@ -59,6 +59,21 @@ public class DeviceController {
     }
 
     /**
+     * PUT /device/update/{deviceId}
+     * Body: { "name", "type", "location", "metadata", "company", "watt", "brightness", "speed", "temperature" }
+     */
+    @PutMapping("/device/update/{deviceId}")
+    public ResponseEntity<ApiResponse<DeviceResponse>> updateDevice(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long deviceId,
+            @Valid @RequestBody DeviceRequest request) {
+
+        DeviceResponse device = deviceService.updateDevice(userDetails.getUsername(), deviceId, request);
+        return ResponseEntity.ok(
+                ApiResponse.success("Device updated successfully", device));
+    }
+
+    /**
      * PUT /device/control
      * Body: { "deviceId": 1, "action": "ON" | "OFF" }
      */
@@ -75,6 +90,25 @@ public class DeviceController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Device " + action.toUpperCase() + " successfully", device));
+    }
+
+    /**
+     * PUT /device/status
+     * Body: { "deviceId": 1, "status": "ON" | "OFF" }
+     */
+    @PutMapping("/device/status")
+    public ResponseEntity<ApiResponse<DeviceResponse>> reportDeviceStatus(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody Map<String, Object> body) {
+
+        Long deviceId = Long.valueOf(body.get("deviceId").toString());
+        String status = body.get("status").toString();
+
+        DeviceResponse device = deviceService.controlDevice(
+                userDetails.getUsername(), deviceId, status, "DEVICE", "Device status report");
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Device status updated successfully", device));
     }
 
     /**

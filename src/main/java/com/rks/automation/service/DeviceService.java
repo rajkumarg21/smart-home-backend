@@ -16,8 +16,14 @@ public interface DeviceService {
     /** Add a new device for the authenticated user. */
     DeviceResponse addDevice(String username, DeviceRequest request);
 
+    /** Update a device owned by the authenticated user. */
+    DeviceResponse updateDevice(String username, Long deviceId, DeviceRequest request);
+
     /** Control a device — action is "ON" or "OFF". */
     DeviceResponse controlDevice(String username, Long deviceId, String action);
+
+    /** Control a device and record the command source for device communication. */
+    DeviceResponse controlDevice(String username, Long deviceId, String action, String source, String command);
 
     /** Delete a device owned by the authenticated user. */
     void deleteDevice(String username, Long deviceId);

@@ -25,6 +25,11 @@ public class DeviceResponse {
     private String location;
     private String status;
     private String metadata;
+    private String company;
+    private Double watt;
+    private Integer brightness;
+    private Integer speed;
+    private Double temperature;
     private Long userId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -38,6 +43,11 @@ public class DeviceResponse {
                 .location(device.getLocation())
                 .status(device.getStatus())
                 .metadata(device.getMetadata())
+                .company(device.getCompany())
+                .watt(device.getWatt())
+                .brightness(device.getBrightness())
+                .speed(device.getSpeed())
+                .temperature(device.getTemperature())
                 .userId(device.getUser().getId())
                 .createdAt(device.getCreatedAt())
                 .updatedAt(device.getUpdatedAt())
