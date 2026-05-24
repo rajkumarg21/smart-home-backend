@@ -18,4 +18,14 @@ public class DeviceRequest {
     private String location;
 
     private String metadata;
+
+    private String company;
+
+    private Double watt;
+
+    private Integer brightness;
+
+    private Integer speed;
+
+    private Double temperature;
 }

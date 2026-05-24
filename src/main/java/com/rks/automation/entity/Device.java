@@ -43,6 +43,17 @@ public class Device {
     @Column(length = 255)
     private String metadata;
 
+    @Column(length = 100)
+    private String company;
+
+    private Double watt;
+
+    private Integer brightness;
+
+    private Integer speed;
+
+    private Double temperature;
+
     /** Owner of this device */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

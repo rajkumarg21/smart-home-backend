@@ -59,6 +59,21 @@ public class DeviceController {
     }
 
     /**
+     * PUT /device/update/{deviceId}
+     * Body: { "name", "type", "location", "metadata", "company", "watt", "brightness", "speed", "temperature" }
+     */
+    @PutMapping("/device/update/{deviceId}")
+    public ResponseEntity<ApiResponse<DeviceResponse>> updateDevice(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long deviceId,
+            @Valid @RequestBody DeviceRequest request) {
+
+        DeviceResponse device = deviceService.updateDevice(userDetails.getUsername(), deviceId, request);
+        return ResponseEntity.ok(
+                ApiResponse.success("Device updated successfully", device));
+    }
+
+    /**
      * PUT /device/control
      * Body: { "deviceId": 1, "action": "ON" | "OFF" }
      */

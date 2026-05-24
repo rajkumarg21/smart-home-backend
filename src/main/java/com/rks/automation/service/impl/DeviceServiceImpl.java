@@ -8,7 +8,9 @@ import com.rks.automation.repository.DeviceRepository;
 import com.rks.automation.repository.UserRepository;
 import com.rks.automation.service.DeviceCommandPublisher;
 import com.rks.automation.service.DeviceService;
+import com.rks.automation.service.PredictiveAutomationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,12 +24,22 @@ import java.util.List;
  * read, control, or delete a device they don't own.
  */
 @Service
-@RequiredArgsConstructor
 public class DeviceServiceImpl implements DeviceService {
 
     private final DeviceRepository deviceRepository;
     private final UserRepository   userRepository;
     private final DeviceCommandPublisher deviceCommandPublisher;
+    private final PredictiveAutomationService predictionService;
+
+    public DeviceServiceImpl(DeviceRepository deviceRepository,
+                             UserRepository userRepository,
+                             DeviceCommandPublisher deviceCommandPublisher,
+                             @Lazy PredictiveAutomationService predictionService) {
+        this.deviceRepository = deviceRepository;
+        this.userRepository = userRepository;
+        this.deviceCommandPublisher = deviceCommandPublisher;
+        this.predictionService = predictionService;
+    }
 
     // ── GET /device/list ─────────────────────────────────────────────────────
 
@@ -60,6 +72,11 @@ public class DeviceServiceImpl implements DeviceService {
                 .type(request.getType())
                 .location(request.getLocation())
                 .metadata(request.getMetadata())
+                .company(request.getCompany())
+                .watt(request.getWatt())
+                .brightness(request.getBrightness())
+                .speed(request.getSpeed())
+                .temperature(request.getTemperature())
                 .status("OFF")
                 .user(user)
                 .build();
@@ -68,6 +85,28 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     // ── PUT /device/control ──────────────────────────────────────────────────
+
+    @Override
+    @Transactional
+    public DeviceResponse updateDevice(String username, Long deviceId, DeviceRequest request) {
+        User user = resolveUser(username);
+
+        Device device = deviceRepository.findByIdAndUserId(deviceId, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Device not found with id: " + deviceId));
+
+        device.setName(request.getName());
+        device.setType(request.getType());
+        device.setLocation(request.getLocation());
+        device.setMetadata(request.getMetadata());
+        device.setCompany(request.getCompany());
+        device.setWatt(request.getWatt());
+        device.setBrightness(request.getBrightness());
+        device.setSpeed(request.getSpeed());
+        device.setTemperature(request.getTemperature());
+
+        return DeviceResponse.from(deviceRepository.save(device));
+    }
 
     /**
      * Turns a device ON or OFF.
@@ -98,6 +137,8 @@ public class DeviceServiceImpl implements DeviceService {
         device.setStatus(normalized);
         DeviceResponse response = DeviceResponse.from(deviceRepository.save(device));
         deviceCommandPublisher.publish(response, normalized, source, command);
+        // Record behavior for AI predictive automation
+        predictionService.recordBehavior(user, device, normalized, source);
         return response;
     }
 

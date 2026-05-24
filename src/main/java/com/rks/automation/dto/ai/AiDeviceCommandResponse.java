@@ -22,6 +22,10 @@ public class AiDeviceCommandResponse {
     private String period;
     private Double totalRuntimeMinutes;
     private Double totalEnergyKwh;
+    private Integer totalDeviceCount;
+    private Integer onDeviceCount;
+    private Integer offDeviceCount;
     private List<DeviceResponse> affectedDevices;
     private List<AiDeviceMetric> metrics;
+    private List<AiDeviceConfigSummary> deviceConfigs;
 }
