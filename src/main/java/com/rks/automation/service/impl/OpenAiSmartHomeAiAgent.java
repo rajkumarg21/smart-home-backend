@@ -3,6 +3,7 @@ package com.rks.automation.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rks.automation.dto.ai.AiCommandDecision;
+import com.rks.automation.dto.ai.AiUsageReportResponse;
 import com.rks.automation.dto.device.DeviceResponse;
 import com.rks.automation.service.SmartHomeAiAgent;
 import lombok.extern.slf4j.Slf4j;
@@ -77,6 +78,41 @@ public class OpenAiSmartHomeAiAgent implements SmartHomeAiAgent {
             return Optional.of(objectMapper.readValue(jsonText, AiCommandDecision.class));
         } catch (Exception ex) {
             log.warn("AI agent interpretation failed. Falling back to local rules.", ex);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<String> generateUsageReport(AiUsageReportResponse report) {
+        if (!enabled || apiKey == null || apiKey.isBlank()) {
+            return Optional.empty();
+        }
+
+        try {
+            Map<String, Object> request = Map.of(
+                    "model", model,
+                    "temperature", 0.2,
+                    "instructions", """
+                            You are SmartHomeUsageReporter.
+                            Write a concise, friendly smart-home usage report for the device owner.
+                            Focus on runtime, energy, top consumers, unusual usage, and practical savings tips.
+                            Keep it under 140 words. Do not invent values not present in the JSON.
+                            """,
+                    "input", objectMapper.writeValueAsString(report)
+            );
+
+            String response = RestClient.create()
+                    .post()
+                    .uri(baseUrl)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .retrieve()
+                    .body(String.class);
+
+            return Optional.of(extractOutputText(response).trim());
+        } catch (Exception ex) {
+            log.warn("AI usage report generation failed. Falling back to local report.", ex);
             return Optional.empty();
         }
     }
